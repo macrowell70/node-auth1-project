@@ -6,7 +6,7 @@ const { checkUsernameFree, checkUsernameExists, checkPasswordLength } = require(
 
 const router = express.Router();
 
-router.post('/register', checkUsernameFree, (req, res, next) => {
+router.post('/register', checkUsernameFree, checkPasswordLength, (req, res, next) => {
   Users.add(req.body)
     .then(user => res.json(user))
     .catch(err => next(err.message))
