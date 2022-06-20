@@ -17,15 +17,20 @@ function findBy(filter) {
 /**
   resolves to the user { user_id, username } with the given user_id
  */
-function findById(user_id) {
-
+async function findById(user_id) {
+  const user = await db('users').where({ user_id }).first();
+  return {
+    user_id: user.user_id,
+    username: user.username
+  }
 }
 
 /**
   resolves to the newly inserted user { user_id, username }
  */
-function add(user) {
-
+async function add(user) {
+  const [user_id] = await db('users').insert(user)
+  return findById(user_id)
 }
 
 // Don't forget to add these to the `exports` object so they can be required in other modules
