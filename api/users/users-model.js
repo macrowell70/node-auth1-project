@@ -5,6 +5,8 @@ const db = require('../../data/db-config');
  */
 function find() {
   return db('users')
+    .select('user_id', 'username')
+    .orderBy('user_id')
 }
 
 /**
@@ -17,9 +19,11 @@ function findBy(filter) {
 /**
   resolves to the user { user_id, username } with the given user_id
  */
-async function findById(user_id) {
-  const user = await db('users').where({ user_id }).first();
-  return { user_id: user.user_id, username: user.username };
+function findById(user_id) {
+  return db('users')
+    .where({ user_id })
+    .first()
+    .select('user_id', 'username');
 }
 
 /**
