@@ -1,4 +1,5 @@
 const express = require("express");
+const session = require("express-session");
 const helmet = require("helmet");
 const cors = require("cors");
 
@@ -23,6 +24,19 @@ const server = express();
 server.use(helmet());
 server.use(express.json());
 server.use(cors());
+server.use(
+  session({
+    name: "chocolatechip",
+    secret: "something long and random",
+    cookie: {
+      maxAge: 1 * 24 * 60 * 60 * 1000,
+      secure: false,
+      httpOnly: false
+    },
+    resave: false,
+    saveUninitialized: false
+  })
+)
 
 server.get("/", (req, res) => {
   res.json({ api: "up" });
