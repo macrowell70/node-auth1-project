@@ -1,6 +1,7 @@
 const Users = require('../users/users-model');
 const bcrypt = require('bcryptjs');
 
+
 /*
   If the user does not have a session saved in the server
 
@@ -10,7 +11,10 @@ const bcrypt = require('bcryptjs');
   }
 */
 function restricted(req, res, next) {
-  const { username, password } = req.body
+  if (req.session.user) { next() }
+  else {
+    next({ status: 401, message: "You shall not pass!" })
+  }
 }
 
 /*
@@ -25,10 +29,10 @@ async function checkUsernameFree(req, res, next) {
   try {
     let { username } = req.body
     const user = await Users.findBy({ username })
-    if (user.length != 0 ) {
-      next({ status: 422, message: "Username already exists" })
+    if (user.length) {
+      next({ status: 422, message: "Username taken" })
     }
-    if (user.length == 0) {
+    else {
       next()
     }
   } catch (err) {
@@ -49,7 +53,7 @@ function checkUsernameExists(req, res, next) {
   Users.findBy({ username })
     .then(user => {
       if(!user) { next({ status: 401, message: "Invalid credentials" }) }
-      next()
+      else {next()}
     })
     .catch(err => next(err.message))
 }
@@ -63,12 +67,10 @@ function checkUsernameExists(req, res, next) {
   }
 */
 function checkPasswordLength(req, res, next) {
-  const credentials = req.body
-  if (!credentials.password || credentials.password.length <= 3) {
+  const { password } = req.body
+  if (!password || password.length <= 3) {
     next({ status: 422, message: "Password must be longer than 3 chars" })
   }
-  const hash = bcrypt.hashSync(credentials.password, 14)
-  credentials.password = hash
   next()
 }
 
